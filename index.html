@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 Attendance Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .results-container {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .results-section {
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid;
+        }
+
+        .section-75 {
+            background: #fff9e6;
+            border-color: #ffc107;
+        }
+
+        .section-80-85 {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section-75 .section-title {
+            color: #f57c00;
+        }
+
+        .section-80-85 .section-title {
+            color: #2e7d32;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        .section-75 .result-value {
+            color: #f57c00;
+        }
+
+        .section-80-85 .result-value {
+            color: #2e7d32;
+        }
+
+        .current-attendance {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-top: 20px;
+            grid-column: 1 / -1;
+        }
+
+        .current-attendance-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-top: 10px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            grid-column: 1 / -1;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            grid-column: 1 / -1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .results-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Attendance Calculator</h1>
+            <p>Calculate your attendance and plan ahead</p>
+        </header>
+
+        <div id="message"></div>
+
+        <div class="form-group">
+            <label for="totalNow">Lectures Conducted Till Now</label>
+            <input type="number" id="totalNow" placeholder="e.g., 42" min="1">
+        </div>
+
+        <div class="form-group">
+            <label for="attendedNow">Lectures Attended Till Now</label>
+            <input type="number" id="attendedNow" placeholder="e.g., 32" min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="semesterTotal">Total Lectures in Full Semester</label>
+            <input type="number" id="semesterTotal" placeholder="e.g., 60" min="1">
+        </div>
+
+        <button onclick="calculateAttendance()">Calculate Attendance</button>
+
+        <div id="results" class="hidden">
+            <div class="current-attendance">
+                <div class="result-label">Your Current Attendance</div>
+                <div class="current-attendance-value" id="currentPercent">0%</div>
+                <div class="result-label" style="margin-top: 10px;">Lectures Remaining: <strong id="remainingLectures">0</strong></div>
+            </div>
+
+            <div class="results-container">
+                <!-- 75% Section -->
+                <div class="results-section section-75">
+                    <div class="section-title">📊 75% Target</div>
+                    <div class="result-item">
+                        <span class="result-label">Need to Attend:</span>
+                        <span class="result-value" id="neededFor75">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Can Skip:</span>
+                        <span class="result-value" id="canSkip75">0</span>
+                    </div>
+                </div>
+
+                <!-- 80% & 85% Section -->
+                <div class="results-section section-80-85">
+                    <div class="section-title">🎯 80% & 85% Target</div>
+                    <div class="result-item">
+                        <span class="result-label">For 80% - Need:</span>
+                        <span class="result-value" id="neededFor80">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">For 85% - Need:</span>
+                        <span class="result-value" id="neededFor85">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Can Skip (80%):</span>
+                        <span class="result-value" id="canSkip80">0</span>
+                    </div>
+                </div>
+
+                <div id="warningMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Made by Shivraj | College Attendance Calculator
+    </footer>
+
+    <script>
+        function calculateAttendance() {
+            const totalNow = parseInt(document.getElementById('totalNow').value);
+            const attendedNow = parseInt(document.getElementById('attendedNow').value);
+            const semesterTotal = parseInt(document.getElementById('semesterTotal').value);
+            const messageDiv = document.getElementById('message');
+
+            // Clear previous messages
+            messageDiv.innerHTML = '';
+
+            // Validation
+            if (!totalNow || !attendedNow || !semesterTotal) {
+                messageDiv.innerHTML = '<div class="message error-message">⚠️ Please fill in all fields</div>';
+                return;
+            }
+
+            if (attendedNow > totalNow) {
+                messageDiv.innerHTML = '<div class="message error-message">⚠️ Attended lectures cannot exceed total lectures</div>';
+                return;
+            }
+
+            if (totalNow > semesterTotal) {
+                messageDiv.innerHTML = '<div class="message error-message">⚠️ Current lectures cannot exceed semester total</div>';
+                return;
+            }
+
+            // Calculations
+            const currentPercent = (attendedNow / totalNow) * 100;
+            const remainingLectures = semesterTotal - totalNow;
+            
+            // For 75%
+            const neededFor75 = Math.ceil((0.75 * semesterTotal) - attendedNow);
+            let canSkip75 = 0;
+            if (neededFor75 <= 0) {
+                // Already achieved target, can skip remaining lectures
+                canSkip75 = remainingLectures + Math.abs(neededFor75);
+            } else if (neededFor75 < remainingLectures) {
+                // Need some lectures, can skip the rest
+                canSkip75 = remainingLectures - neededFor75;
+            }
+            
+            // For 80%
+            const neededFor80 = Math.ceil((0.80 * semesterTotal) - attendedNow);
+            let canSkip80 = 0;
+            if (neededFor80 <= 0) {
+                canSkip80 = remainingLectures + Math.abs(neededFor80);
+            } else if (neededFor80 < remainingLectures) {
+                canSkip80 = remainingLectures - neededFor80;
+            }
+            
+            // For 85%
+            const neededFor85 = Math.ceil((0.85 * semesterTotal) - attendedNow);
+
+            // Display current attendance
+            document.getElementById('currentPercent').textContent = currentPercent.toFixed(2) + '%';
+            document.getElementById('remainingLectures').textContent = remainingLectures;
+
+            // Display 75% section
+            if (neededFor75 > 0) {
+                if (neededFor75 > remainingLectures) {
+                    document.getElementById('neededFor75').textContent = 'Not Possible ❌';
+                } else {
+                    document.getElementById('neededFor75').textContent = neededFor75 + ' lectures';
+                }
+            } else {
+                document.getElementById('neededFor75').textContent = 'Target achieved! ✓';
+            }
+            document.getElementById('canSkip75').textContent = canSkip75 > 0 ? canSkip75 + ' lectures' : '0 lectures';
+
+            // Display 80% & 85% section
+            if (neededFor80 > 0) {
+                if (neededFor80 > remainingLectures) {
+                    document.getElementById('neededFor80').textContent = 'Not Possible ❌';
+                } else {
+                    document.getElementById('neededFor80').textContent = neededFor80 + ' lectures';
+                }
+            } else {
+                document.getElementById('neededFor80').textContent = 'Target achieved! ✓';
+            }
+            
+            if (neededFor85 > 0) {
+                if (neededFor85 > remainingLectures) {
+                    document.getElementById('neededFor85').textContent = 'Not Possible ❌';
+                } else {
+                    document.getElementById('neededFor85').textContent = neededFor85 + ' lectures';
+                }
+            } else {
+                document.getElementById('neededFor85').textContent = 'Target achieved! ✓';
+            }
+            
+            document.getElementById('canSkip80').textContent = canSkip80 > 0 ? canSkip80 + ' lectures' : '0 lectures';
+
+            // Warning message
+            const warningDiv = document.getElementById('warningMessage');
+            if (currentPercent < 75) {
+                warningDiv.innerHTML = '<div class="warning">⚠️ Warning: Your attendance is below 75%. You need to attend ' + neededFor75 + ' more lectures to reach 75%!</div>';
+            } else if (currentPercent >= 75 && currentPercent < 80) {
+                warningDiv.innerHTML = '<div class="success">✅ Good! Your attendance is above 75%. Keep it up!</div>';
+            } else if (currentPercent >= 80 && currentPercent < 85) {
+                warningDiv.innerHTML = '<div class="success">✅ Great! Your attendance is above 80%. Almost at 85%!</div>';
+            } else {
+                warningDiv.innerHTML = '<div class="success">✅ Excellent! Your attendance is above 85%. Outstanding!</div>';
+            }
+
+            // Show results
+            document.getElementById('results').classList.remove('hidden');
+        }
+
+        // Allow Enter key to calculate
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateAttendance();
+            }
+        });
+    </script>
+</body>
+</html>
