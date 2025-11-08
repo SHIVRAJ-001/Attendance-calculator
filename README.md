@@ -13,7 +13,7 @@ A simple and elegant web-based attendance calculator to help college students tr
 
 ## 🚀 Demo
 
-[Live Demo](#) *(Add your live demo link here)*
+[Live Demo](https://shivraj-001.github.io/Attendance-calculator/) 
 
 
 
